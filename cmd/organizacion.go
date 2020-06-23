@@ -36,11 +36,11 @@ var organizacionCmd = &cobra.Command{
 	Short: "Inicializa los datos de prueba para una organizacion",
 	Long:  `Inicializa datos de prueba`,
 	Run: func(cmd *cobra.Command, args []string) {
-		borrar, _ := cmd.Flags().GetBool("borrar")
+		borrar, _ := cmd.Parent().PersistentFlags().GetBool("borrar")
 		if borrar {
 			borrarOrganizaciones()
 		} else {
-			InicializarOrganizaciones()
+			inicializarOrganizaciones()
 		}
 	},
 }
@@ -57,13 +57,12 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// organizacionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	organizacionCmd.Flags().BoolP("borrar", "b", false, "--borrar o -b para borrar los datos actuales de la BD")
 }
 
 var organizaciones []models.Organizacion
 
 // Inicializa la lista de organizaciones
-func InicializarOrganizaciones() {
+func inicializarOrganizaciones() {
 	faker.Locale = locales.En
 	rand.Seed(50)
 	total := rand.Intn(42)

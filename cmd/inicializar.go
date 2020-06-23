@@ -50,6 +50,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// inicializarCmd.PersistentFlags().String("foo", "", "A help for foo")
+	inicializarCmd.PersistentFlags().BoolP("borrar", "b", false, "--borrar o -b para borrar los datos actuales de la BD")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
