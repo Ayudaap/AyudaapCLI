@@ -70,7 +70,7 @@ func init() {
 func newRepositorio() {
 	fmt.Printf("nuevo Repo %s\n", nombreOpcion)
 
-	archivo, err := ioutil.ReadFile("plantillas/repositorio.tmp")
+	archivo, err := ioutil.ReadFile("/Users/erikvillegas/go/src/AyudaapCLI/plantillas/repositorio.tmp")
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +92,7 @@ func newRepositorio() {
 }
 
 func newRuta() {
-	archivo, err := ioutil.ReadFile("plantillas/ruta.tmp")
+	archivo, err := ioutil.ReadFile("/Users/erikvillegas/go/src/AyudaapCLI/plantillas/ruta.tmp")
 
 	if err != nil {
 		panic(err)
@@ -113,7 +113,7 @@ func newRuta() {
 
 func newModelo() {
 
-	archivo, err := ioutil.ReadFile("plantillas/modelo.tmp")
+	archivo, err := ioutil.ReadFile("/Users/erikvillegas/go/src/AyudaapCLI/plantillas/modelo.tmp")
 	if err != nil {
 		panic(err)
 	}
