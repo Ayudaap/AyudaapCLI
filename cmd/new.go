@@ -17,12 +17,15 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-//nombreOpcion Nombre del elemento
-var nombreOpcion string
+//nombreOpcion
+var nombreOpcion, salida string
 
 // newCmd represents the new command
 var newCmd = &cobra.Command{
@@ -41,6 +44,9 @@ var newCmd = &cobra.Command{
 		case "modelo":
 			newModelo()
 			break
+		default:
+			log.Printf("Opcion invalida")
+			break
 		}
 	},
 }
@@ -58,10 +64,29 @@ func init() {
 	// is called directly, e.g.:
 	// newCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	newCmd.Flags().StringVarP(&nombreOpcion, "nombre", "n", "r", "Nombre del componente")
+	newCmd.Flags().StringVarP(&salida, "salida", "s", "r", "ruta de salida")
 }
 
 func newRepositorio() {
 	fmt.Printf("nuevo Repo %s\n", nombreOpcion)
+
+	archivo, err := ioutil.ReadFile("plantillas/repositorio.tmp")
+	if err != nil {
+		panic(err)
+	}
+
+	nombreMinusculas := strings.ToLower(nombreOpcion)
+	nombreInicial := nombreOpcion[0:1]
+	nombreInicial = strings.ToLower(nombreInicial)
+
+	newContents := strings.Replace(string(archivo), "<%nombre%>", nombreOpcion, -1)
+	newContents = strings.Replace(newContents, "<%nombreMinusculas%>", nombreMinusculas, -1)
+	newContents = strings.Replace(newContents, "<%nombreInicial%>", nombreInicial, -1)
+	err = ioutil.WriteFile(salida, []byte(newContents), 0764)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func newRuta() {

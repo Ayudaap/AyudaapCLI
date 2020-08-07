@@ -1,0 +1,130 @@
+package repository
+
+import (
+	"log"
+	"time"
+
+	"Ayudaap.org/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+//<%nombre%>Repository Repositorio de base de datos
+type <%nombre%>Repository struct {
+	DbRepo MongoRepository
+}
+
+//<%nombre%>Collection Nombre de la tabla de <%nombreMinusculas%>
+const <%nombre%>Collection string = "<%nombreMinusculas%>"
+
+//Insertar<%nombre%> Inserta una nueva instancia de <%nombre%>
+func (<%nombreInicial%> *<%nombre%>Repository) Insertar<%nombre%>(<%nombreMinusculas%> models.<%nombre%>) string {
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	<%nombreMinusculas%>.Auditoria = models.Auditoria{
+		CreatedAt: primitive.Timestamp{T: uint32(time.Now().Unix())},
+		UpdatedAt: primitive.Timestamp{T: uint32(time.Now().Unix())},
+	}
+
+	resultado, err := col.InsertOne(ctx, <%nombreMinusculas%>)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ObjectID, _ := resultado.InsertedID.(primitive.ObjectID)
+
+	var result string = ObjectID.Hex()
+	return result
+}
+
+//GetAll<%nombre%> Obtiene todas los <%nombreMinusculas%>
+func (<%nombreInicial%> *<%nombre%>Repository) GetAll<%nombre%>() []models.<%nombre%> {
+	var <%nombreMinusculas%> []models.<%nombre%>
+
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	datos, err := col.Find(ctx, bson.D{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for datos.Next(ctx) {
+		var <%nombre%> models.<%nombre%>
+		err := datos.Decode(&<%nombre%>)
+		if err != nil {
+			log.Fatal(err)
+		}
+		<%nombreMinusculas%> = append(<%nombreMinusculas%>, <%nombre%>)
+	}
+	return <%nombreMinusculas%>
+}
+
+//Get<%nombre%>ByID Obtiene una <%nombre%> por Id
+func (<%nombreInicial%> *<%nombre%>Repository) Get<%nombre%>ByID(id string) *models.<%nombre%> {
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	Oid, _ := primitive.ObjectIDFromHex(id)
+
+	var <%nombre%> *models.<%nombre%>
+	err := col.FindOne(ctx, bson.M{"_id": Oid}).Decode(&<%nombre%>)
+	if err != nil {
+		return nil
+	}
+
+	return <%nombre%>
+}
+
+//Delete<%nombre%> Elimina una <%nombre%>
+func (<%nombreInicial%> *<%nombre%>Repository) Delete<%nombre%>(id string) (int, error) {
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	oID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	filter := bson.M{"_id": oID}
+
+	result, err := col.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if result.DeletedCount <= 0 {
+		return 0, nil
+	}
+
+	return int(result.DeletedCount), nil
+}
+
+//Update<%nombre%> Actualiza una <%nombre%> retornando el total de elementos que se modificaron
+func (<%nombreInicial%> *<%nombre%>Repository) Update<%nombre%>(<%nombreMinusculas%> *models.<%nombre%>) (int64, error) {
+
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	filter := bson.M{"_id": <%nombreMinusculas%>.ID}
+	update := bson.M{"$set": <%nombreMinusculas%>}
+
+	<%nombreMinusculas%>.Auditoria.UpdatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+
+	result, err := col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return 0, err
+	}
+	return result.ModifiedCount, nil
+}
+
+//Purgar<%nombre%> Purgar<%nombre%> borra toda la collecion
+func (<%nombreInicial%> *<%nombre%>Repository) Purgar<%nombre%>() error {
+
+	col, ctx, cancel := <%nombreInicial%>.DbRepo.GetCollection(<%nombre%>Collection)
+	defer cancel()
+
+	err := col.Drop(ctx)
+
+	return err
+}
