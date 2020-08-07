@@ -87,12 +87,42 @@ func newRepositorio() {
 		panic(err)
 	}
 
+	fmt.Printf("Nueva modelo generado: %s \nruta: %s \n", nombreOpcion, salida)
+
 }
 
 func newRuta() {
-	fmt.Printf("nueva ruta %s\n", nombreOpcion)
+	archivo, err := ioutil.ReadFile("plantillas/ruta.tmp")
+
+	if err != nil {
+		panic(err)
+	}
+
+	nombreMinuscula := strings.ToLower(nombreOpcion)
+
+	newContents := strings.Replace(string(archivo), "<%nombreRepo%>", nombreOpcion, -1)
+	newContents = strings.Replace(newContents, "<%nombreMinuscula%>", nombreMinuscula, -1)
+
+	err = ioutil.WriteFile(salida, []byte(newContents), 0764)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Nueva ruta generada: %s \nruta: %s\n", nombreOpcion, salida)
 }
 
 func newModelo() {
-	fmt.Printf("nuevo modelo %s\n", nombreOpcion)
+
+	archivo, err := ioutil.ReadFile("plantillas/modelo.tmp")
+	if err != nil {
+		panic(err)
+	}
+
+	newContents := strings.Replace(string(archivo), "<%nombre%>", nombreOpcion, -1)
+	err = ioutil.WriteFile(salida, []byte(newContents), 0764)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Nueva modelo generado: %s \nruta: %s \n", nombreOpcion, salida)
 }
